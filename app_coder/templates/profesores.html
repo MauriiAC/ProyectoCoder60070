@@ -1,13 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profesores</title>
-</head>
-<body style="background-color: purple;">
- 
-  <h1>Vista del Profesores</h1>
+{% extends 'padre.html' %}
 
-</body>
-</html>
+{% block contenidoQueCambia %}
+  
+  <h1>Los profesores de mi academia son:</h1>
+
+  <ul>
+    <li>Lionel Messi</li>
+    <li>Cristiano Ronaldo</li>
+    <li>Roman Riquelme</li>
+  </ul>
+  
+{% endblock contenidoQueCambia %}
+  
