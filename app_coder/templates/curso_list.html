@@ -1,0 +1,28 @@
+{% extends 'padre.html' %}
+
+{% block contenidoQueCambia %}
+  
+  <h1>Lista de cursos</h1>
+
+  <ul>
+    
+    {% for curso in cursos %}
+      <li>
+        {{ curso }}
+      </li>
+      <div style="display: flex; column-gap: 5px;">
+        <form action="{% url 'EliminaCurso' curso.id %}" method="post">{% csrf_token %}
+          <button type="submit">Eliminar</button>
+        </form>
+        <button>
+          <a href="{% url 'ActualizaCurso' curso.id %}">Editar</a>
+        </button>
+      </div>
+    {% endfor %}
+      
+  </ul>
+
+  <a href="{% url 'CreaCurso' %}">Crea Curso</a>
+
+
+{% endblock contenidoQueCambia %}
