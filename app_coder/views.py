@@ -1,4 +1,8 @@
 from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from .models import Curso, Profesor
 from .forms import CursoFormulario, ProfesorFormulario
@@ -82,7 +86,7 @@ def buscar_camada(req):
 
   return render(req, "resultado_busqueda.html", { "cursos": cursos, "camada": num_camada })
 
-
+@login_required
 def lista_profesores(req):
 
   profesores = Profesor.objects.all()
@@ -162,7 +166,7 @@ def editar_profesor(req, id):
     return render(req, "editar_profesor.html", { "mi_formulario": mi_formulario, "id": profesor.id })
 
 
-class CursoList(ListView):
+class CursoList(LoginRequiredMixin, ListView):
 
   model = Curso
   template_name = 'curso_list.html'
@@ -194,4 +198,54 @@ class CursoDelete(DeleteView):
   model = Curso
   template_name = 'curso_delete.html'
   success_url = '/app-coder'
+  context_object_name = 'curso'
 
+
+def login_view(req):
+
+  if req.method == 'POST':
+    
+    mi_formulario= AuthenticationForm(req, data=req.POST)
+    if mi_formulario.is_valid():
+
+      data = mi_formulario.cleaned_data
+      usuario = data['username']
+      psw = data['password']
+
+      user = authenticate(username=usuario, password=psw)
+
+      if user:
+        login(req, user)
+        return render(req, "inicio.html", { "mensaje": f"Bienvenido {usuario}"})
+      else:
+        return render(req, "inicio.html", { "mensaje": f"Datos incorrectos!"})
+
+    else:
+      return render(req, "login.html", { "mi_formulario": mi_formulario })  
+
+  else:
+
+    mi_formulario = AuthenticationForm()
+    return render(req, "login.html", { "mi_formulario": mi_formulario })  
+
+
+def register(req):
+
+  if req.method == 'POST':
+    
+    mi_formulario= UserCreationForm(req.POST)
+    if mi_formulario.is_valid():
+
+      data = mi_formulario.cleaned_data
+      usuario = data['username']
+      mi_formulario.save()
+
+      return render(req, "inicio.html", { "mensaje": f"Usuario {usuario} creado exitosamente!"})
+
+    else:
+      return render(req, "registro.html", { "mi_formulario": mi_formulario })    
+
+  else:
+
+    mi_formulario = UserCreationForm()
+    return render(req, "registro.html", { "mi_formulario": mi_formulario })    
