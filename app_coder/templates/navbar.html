@@ -11,6 +11,11 @@
 
     
     {% if user.is_authenticated %}
+      
+      {% if url %}
+        <img src="{{url}}" height="30px" alt="avatar">
+      {% endif %}
+        
       <p>Bienvenido {{user.username}}</p>
       <form action="{% url 'Logout' %}" method="post">{% csrf_token %}
         <button class="btn btn-primary" type="submit">Cerrar sesión</button>
