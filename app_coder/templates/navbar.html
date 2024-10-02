@@ -4,7 +4,11 @@
     <div class="home-button">
       <a class="navbar-brand" href="{% url 'Inicio' %}">Inicio</a>
     </div>
-    <a class="navbar-brand" href="{% url 'ListaProfesores' %}">Profesores</a>
+    
+    {% if request.user.profesor %}
+      <a class="navbar-brand" href="{% url 'ListaProfesores' %}">Profesores</a>    
+    {% endif %}
+
     <a class="navbar-brand" href="{% url 'ListaCursos' %}">Cursos</a>
     <a class="navbar-brand" href="{% url 'Entregables' %}">Entregables</a>
     <a class="navbar-brand" href="{% url 'Estudiantes' %}">Estudiantes</a>

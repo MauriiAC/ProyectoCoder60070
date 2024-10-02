@@ -21,6 +21,7 @@ class Estudiante(models.Model):
   nombre = models.CharField(max_length=50)
   apellido = models.CharField(max_length=50)
   email = models.EmailField()
+  cursos = models.ManyToManyField(Curso, related_name='estudiantes')
 
   def __str__(self):
     return f'{self.nombre} {self.apellido}'
@@ -31,6 +32,7 @@ class Profesor(models.Model):
   apellido = models.CharField(max_length=50)
   email = models.EmailField()
   profesion = models.CharField(max_length=50, null=True)
+  user_id = models.OneToOneField(User, on_delete=models.CASCADE)
 
   def __str__(self):
 

@@ -2,3 +2,11 @@
   padding-right: 150px;
   margin-left: -150px;
 }
+
+.lista-cursos {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  row-gap: 20px;
+  justify-items: center;
+  margin-bottom: 30px;
+}

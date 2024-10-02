@@ -1,23 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lista de cursos</title>
-</head>
-<body>
-  
-  Este es nuestro catalogo de cursos:
+{% extends 'padre.html' %}
 
-  <ul>
-    
-    {% for curso in lista_cursos %}
-      <li>{{curso.nombre}} - {{curso.camada}}</li>
-    {% endfor %}
-      
+{% block contenidoQueCambia %}
+
+
+<h1>Este es nuestro catalogo de cursos:</h1>
+
+<section class="lista-cursos">
+
+  {% for curso in lista_cursos %}
+  <div class="card" style="width: 18rem;">
+    <img src="https://www.jacobsoft.com.mx/wp-content/uploads/2021/09/450_1000.jpg" class="card-img-top"
+      alt="course-image">
+    <div class="card-body">
+      <h5 class="card-title">{{curso.nombre}}</h5>
+      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+        content.</p>
+      <a href="#" class="btn btn-primary">Go somewhere</a>
+    </div>
+  </div>
+  {% endfor %}
+
+</section>
+
+<nav aria-label="Page navigation example"></nav>
+  <ul class="pagination">
+    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+    <li class="page-item"><a class="page-link" href="{% url 'CursosOld' current_page %}?direction=next">Next</a></li>
   </ul>
+</nav>
 
 
-
-</body>
-</html>
+{% endblock contenidoQueCambia %}

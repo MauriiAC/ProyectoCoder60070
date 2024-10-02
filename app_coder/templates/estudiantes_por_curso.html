@@ -1,0 +1,15 @@
+{% extends 'padre.html' %} {% block contenidoQueCambia %}
+
+<h1>Estudiantes de {{ curso.nombre }} - camada: {{ curso.camada }}</h1>
+
+<ul>
+  {% for estudiante in estudiantes %}
+  <li>
+    {{ estudiante.nombre }} {{ estudiante.apellido }} - Email: {{ estudiante.email }}
+  </li>
+  {% empty %}
+  <li>No hay estudiantes para este curso.</li>
+  {% endfor %}
+</ul>
+
+{% endblock contenidoQueCambia %}

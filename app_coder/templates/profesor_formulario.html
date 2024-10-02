@@ -5,6 +5,7 @@
   <form action="{% url 'CreaProfesor' %}" method="post">{% csrf_token %}
 
     {{mi_formulario.as_p}}
+    {{user_form.as_p}}
 
     <button type="submit">Enviar</button>
 

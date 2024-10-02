@@ -4,7 +4,7 @@ from .views import *
 
 urlpatterns = [
     path('agrega-curso/<nombre>/<camada>', crea_curso),
-    path('lista-cursos-old/', lista_cursos),
+    path('lista-cursos-old/<int:page>', lista_cursos, name='CursosOld'),
     path('', inicio, name='Inicio'),
     path('profesores/', profesores, name='Profesores'),
     path('cursos/', cursos, name="Cursos"),
@@ -27,4 +27,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(template_name="logout.html"), name='Logout'),
     path('editar-perfil/', editar_perfil, name='EditarPerfil'),
     path('agregar-avatar/', agregar_avatar, name='AgregarAvatar'),
+    path('entregable-por-estudiante/<int:id>', get_entregables_by_estudiante, name='EntregablePorEstudiante'),
+    path('estudiantes-por-curso/<int:id>', get_estudiantes_by_curso, name='EstudiantePorCurso'),
+    path('lista-cursos2/<int:camada>', CursoList.as_view(), name='CursosMinCamada'),
 ]

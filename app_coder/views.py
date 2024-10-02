@@ -4,7 +4,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
-from .models import Curso, Profesor, Avatar
+from django.contrib.auth.models import User
+from .models import Curso, Profesor, Avatar, Estudiante, Entregable
 from .forms import CursoFormulario, ProfesorFormulario, UserEditForm, AvatarFormulario
 
 from django.views.generic import ListView
@@ -22,11 +23,24 @@ def crea_curso(req, nombre, camada):
     <p>Curso: {nuevo_curso.nombre} - Camada {nuevo_curso.camada} creado con éxito!</p>
   """)
 
-def lista_cursos(req):
+def lista_cursos(req, page):
 
-  lista = Curso.objects.all()
+  print('page:', page)
 
-  return render(req, "lista_cursos.html", {"lista_cursos": lista})
+  cant_por_pagina = 3
+
+  if req.GET.get("direction") == 'next':
+    page += 1
+  elif req.GET.get("direction") == 'previous':
+    page -= 1
+
+  inicio = int(page-1)*cant_por_pagina
+  final = int(page)*cant_por_pagina
+
+  lista = Curso.objects.all()[inicio:final]
+  print(lista)
+
+  return render(req, "lista_cursos.html", {"lista_cursos": lista, "current_page": page})
 
 def inicio(req):
 
@@ -96,9 +110,21 @@ def buscar_camada(req):
 @login_required
 def lista_profesores(req):
 
-  profesores = Profesor.objects.all()
+  try:
 
-  return render(req, "leer_profesores.html", { "profesores": profesores })
+    if req.user.profesor:
+
+      profesores = Profesor.objects.all()
+
+      return render(req, "leer_profesores.html", { "profesores": profesores })
+    
+    else:
+
+      return HttpResponseRedirect('/app-coder/')
+  
+  except:
+
+    return HttpResponseRedirect('/app-coder/')
 
 
 def crea_profesor(req):
@@ -108,13 +134,36 @@ def crea_profesor(req):
 
   if req.method == 'POST':
 
-    mi_formulario = ProfesorFormulario(req.POST)
+    info = req.POST
 
-    if mi_formulario.is_valid():
+    mi_formulario = ProfesorFormulario(
+      {
+        "nombre": info["nombre"],
+        "apellido": info["apellido"],
+        "email": info["email"],
+        "profesion": info["profesion"],
+      }
+    )
+
+    user_form = UserCreationForm(
+      {
+        "username": info["username"],
+        "password1": info["password1"],
+        "password2": info["password2"],
+      }
+    )
+
+    if mi_formulario.is_valid() and user_form.is_valid():
 
       data = mi_formulario.cleaned_data
+      data.update(user_form.cleaned_data)
 
-      nuevo_profesor = Profesor(nombre=data["nombre"], apellido=data["apellido"], email=data["email"], profesion=data["profesion"])
+      user = User(username=data["username"])
+      user.set_password(data["password1"])
+      user.save()
+
+      nuevo_profesor = Profesor(nombre=data["nombre"], apellido=data["apellido"], email=data["email"], profesion=data["profesion"], user_id=user)
+
       nuevo_profesor.save()
 
       return HttpResponseRedirect('/app-coder')
@@ -125,7 +174,8 @@ def crea_profesor(req):
   else:
 
     mi_formulario = ProfesorFormulario()
-    return render(req, "profesor_formulario.html", { "mi_formulario": mi_formulario })
+    user_form = UserCreationForm()
+    return render(req, "profesor_formulario.html", { "mi_formulario": mi_formulario, "user_form": user_form })
 
 
 def eliminar_profesor(req, id):
@@ -178,6 +228,12 @@ class CursoList(LoginRequiredMixin, ListView):
   model = Curso
   template_name = 'curso_list.html'
   context_object_name = 'cursos'
+
+  def get_queryset(self):
+    value = self.kwargs["camada"]
+    cursos = Curso.objects.filter(camada__gt=value)
+    return cursos
+  
 
 class CursoDetail(DetailView):
 
@@ -304,4 +360,31 @@ def agregar_avatar(req):
   else:
 
     mi_formulario = AvatarFormulario()
-    return render(req, "agregar_avatar.html", { "mi_formulario": mi_formulario })    
+    return render(req, "agregar_avatar.html", { "mi_formulario": mi_formulario })
+  
+def get_entregables_by_estudiante(req, id):
+
+    estudiante = Estudiante.objects.get(id=id)
+    
+    entregables = Entregable.objects.filter(estudiante=estudiante)
+    
+    context = {
+        'estudiante': estudiante,
+        'entregables': entregables
+    }
+    
+    return render(req, 'entregables_por_estudiante.html', context)
+
+def get_estudiantes_by_curso(req, id):
+
+    curso = Curso.objects.get(id=id)
+    
+    estudiantes = curso.estudiantes.all()
+    
+    context = {
+        'curso': curso,
+        'estudiantes': estudiantes
+    }
+    
+    return render(req, 'estudiantes_por_curso.html', context)
+
